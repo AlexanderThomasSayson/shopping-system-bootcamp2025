@@ -7,6 +7,7 @@ import com.srllc.shopping_system_bootcamp2025.domain.dto.LoginDto;
 import com.srllc.shopping_system_bootcamp2025.domain.dto.UserRegistrationDto;
 import com.srllc.shopping_system_bootcamp2025.domain.entity.Role;
 import com.srllc.shopping_system_bootcamp2025.domain.entity.User;
+import com.srllc.shopping_system_bootcamp2025.domain.exceptions.BadRequestException;
 import com.srllc.shopping_system_bootcamp2025.domain.service.AuthService;
 import com.srllc.shopping_system_bootcamp2025.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -85,12 +86,12 @@ public class AuthServiceImpl implements AuthService {
     private void validateUser(UserRegistrationDto userRegistrationDto){
         if(Boolean.TRUE.equals(userDao.existsByUserName(userRegistrationDto.getUserName()))){
             log.warn("Username: {} is already taken.", userRegistrationDto.getUserName());
-            throw new IllegalArgumentException("Username already exist!");
+            throw new BadRequestException("Username already exist!");
         }
 
         if(Boolean.TRUE.equals(userDao.existsByEmail(userRegistrationDto.getEmail()))){
             log.warn("Email: {} is already taken.", userRegistrationDto.getEmail());
-            throw new IllegalArgumentException("Email already exist!");
+            throw new BadRequestException("Email already exist!");
         }
     }
 }

@@ -1,10 +1,22 @@
 package com.srllc.shopping_system_bootcamp2025.common.utils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 
 public class DefaultResponse {
+
+    /**
+     * Get the current HTTP request using Spring's RequestContextHolder.
+     */
+    private static HttpServletRequest getCurrentRequest() {
+        ServletRequestAttributes attributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        return attributes != null ? attributes.getRequest() : null;
+    }
 
     /**
      * Creates an API response with the specified parameters.
@@ -23,6 +35,8 @@ public class DefaultResponse {
             String message,
             T payload,
             int errorCode) {
+
+        HttpServletRequest request = getCurrentRequest();
         return new ApiResponse<>(
                 status,
                 success,
@@ -31,7 +45,7 @@ public class DefaultResponse {
                 null,
                 errorCode,
                 LocalDateTime.now(),
-                null // path
+                request != null ? request.getRequestURI() : null
         );
     }
 

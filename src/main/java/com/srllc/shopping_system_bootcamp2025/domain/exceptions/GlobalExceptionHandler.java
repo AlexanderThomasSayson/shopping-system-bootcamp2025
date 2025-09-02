@@ -1,17 +1,22 @@
 package com.srllc.shopping_system_bootcamp2025.domain.exceptions;
 
 import com.srllc.shopping_system_bootcamp2025.common.utils.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +24,17 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    /**
+     * Get the current HTTP request path.
+     */
+    private String getCurrentPath() {
+        ServletRequestAttributes attributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes != null ? attributes.getRequest() : null;
+        return request != null ? request.getRequestURI() : "N/A";
+    }
+
     /**
      * Handles MethodArgumentNotValidException for validation errors and returns a
      * 400 Bad Request status.
@@ -43,7 +59,9 @@ public class GlobalExceptionHandler {
         response.setMessage("Validation failed for one or more arguments.");
         response.setPayload(errors);
         response.setErrors(List.of(errors));
-
+        response.setErrorCode(403);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -53,6 +71,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY);
         response.setMessage(ex.getMessage());
         response.setPayload(null);
+        response.setErrorCode(404);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -62,6 +83,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.BAD_REQUEST);
         response.setMessage("Bad Request: " + ex.getMessage());
         response.setPayload(null);
+        response.setErrorCode(403);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -71,6 +95,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY);
         response.setMessage("Invalid action: " + ex.getMessage());
         response.setPayload(null);
+        response.setErrorCode(403);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
@@ -89,6 +116,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.FORBIDDEN);
         response.setMessage("Access Denied: " + ex.getMessage());
         response.setPayload(null);
+        response.setErrorCode(403);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
@@ -98,6 +128,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.BAD_REQUEST);
         response.setMessage("Illegal argument: " + ex.getMessage());
         response.setPayload(null);
+        response.setErrorCode(403);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -119,12 +152,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<String>> handleBadCredentials(BadCredentialsException ex) {
+        ApiResponse<String> response = new ApiResponse<>();
+        response.setHttpStatus(HttpStatus.BAD_REQUEST);
+        response.setMessage("Bad Credentials! Please check your details.");
+        response.setPayload(null);
+        response.setErrorCode(401);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleGeneralException(Exception ex) {
         ApiResponse<String> response = new ApiResponse<>();
         response.setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY);
         response.setMessage(ex.getMessage());
         response.setPayload(null);
+        response.setErrorCode(500);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
