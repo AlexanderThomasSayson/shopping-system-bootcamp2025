@@ -28,7 +28,7 @@ public class OpenApiConfig {
                         .title("Shopping System for Bootcamp Batch 2025")
                         .version("1.0")
                         .description("""
-                                API documentation for Bountiply Voucher Redemption Service.
+                                API documentation for Shopping System Service.
                                 
                                 **Back-End Developers:**
                                 - Alexander Thomas Sayson
