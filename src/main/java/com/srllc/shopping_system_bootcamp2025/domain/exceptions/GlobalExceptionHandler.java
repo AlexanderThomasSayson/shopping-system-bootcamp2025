@@ -25,6 +25,9 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    // See HTTP response  status codes:
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
+
     /**
      * Get the current HTTP request path.
      */
@@ -59,7 +62,7 @@ public class GlobalExceptionHandler {
         response.setMessage("Validation failed for one or more arguments.");
         response.setPayload(errors);
         response.setErrors(List.of(errors));
-        response.setErrorCode(403);
+        response.setErrorCode(400);
         response.setTimestamp(LocalDateTime.now());
         response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -107,6 +110,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.FORBIDDEN);
         response.setMessage("You do not have permission to perform this action.");
         response.setPayload(null);
+        response.setErrorCode(403);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
@@ -128,7 +134,7 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.BAD_REQUEST);
         response.setMessage("Illegal argument: " + ex.getMessage());
         response.setPayload(null);
-        response.setErrorCode(403);
+        response.setErrorCode(400);
         response.setTimestamp(LocalDateTime.now());
         response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -140,6 +146,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.BAD_REQUEST);
         response.setMessage("Malformed JSON request.");
         response.setPayload(null);
+        response.setErrorCode(400);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -149,6 +158,9 @@ public class GlobalExceptionHandler {
         response.setHttpStatus(HttpStatus.BAD_REQUEST);
         response.setMessage("Missing required parameter: " + ex.getParameterName());
         response.setPayload(null);
+        response.setErrorCode(400);
+        response.setTimestamp(LocalDateTime.now());
+        response.setPath(getCurrentPath());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
