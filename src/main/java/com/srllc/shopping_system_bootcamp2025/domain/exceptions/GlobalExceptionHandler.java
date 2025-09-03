@@ -59,6 +59,7 @@ public class GlobalExceptionHandler {
 
         // Create the ApiResponse object
         ApiResponse<Map<String, String>> response = new ApiResponse<>();
+        response.setHttpStatus(HttpStatus.BAD_REQUEST);
         response.setMessage("Validation failed for one or more arguments.");
         response.setPayload(errors);
         response.setErrors(List.of(errors));
